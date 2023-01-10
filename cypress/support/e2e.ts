@@ -22,7 +22,15 @@ import "./commands";
 declare global {
   namespace Cypress {
     interface Chainable<Subject> {
-      openLoginPage(): Chainable<any>;
+      login(userName: string, password: string): Chainable<any>;
+    }
+  }
+}
+
+declare global {
+  namespace Cypress {
+    interface Chainable<Subject> {
+      visit(path: string, options: Partial<VisitOptions>): Chainable<any>;
     }
   }
 }

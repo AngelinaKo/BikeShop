@@ -1,13 +1,31 @@
 /// <reference types="cypress" />
-Cypress.Commands.add("openLoginPage", () => {
-  cy.visit("/", {
+
+Cypress.Commands.overwrite('visit', (originalFn, path, options) => {
+  // workaround for Cypress defect, more info // https://github.com/cypress-io/cypress/issues/16192
+  originalFn(path, {
     onBeforeLoad(win) {
-        // @ts-expect-error
+      // @ts-expect-error
       delete win.navigator.__proto__.serviceWorker;
     },
-  });
+    ...options
+  })
+})
 
-  cy.get("#user-name").should("be.visible");
+Cypress.Commands.add("login", (userName, password) => {
+  cy.session([userName, password], () => {
+
+    cy.visit('/')
+    cy.get('[data-test="username"]').type(userName);
+    cy.get('[data-test="password"]').type(password);
+    cy.get('[data-test="login-button"]').click();
+    cy.url().should('include', '/inventory.html')
+  },
+    {
+      validate() {
+        cy.visit('/?/cart.html')
+      },
+    }
+  )
 });
 
 // ***********************************************
