@@ -1,27 +1,35 @@
-describe("Test purchise flow", () => {
+import buyer from '../fixtures/buyer.json'
+const userLogin = Cypress.env('STANDART_USER').username
+const userPassword = Cypress.env('STANDART_USER').password
+const backpack = "sauce-labs-backpack"
+const backpackName = "Sauce Labs Backpack"
+
+describe("Test purchase flow", () => {
 
   beforeEach(() => {
-    cy.login('standard_user', 'secret_sauce')
-  })
-
-
-  it("Should add product to cart", () => {
-    cy.visit('?/inventory.html')
-    cy.contains('Sauce Labs Backpack');
-    cy.get('#add-to-cart-sauce-labs-backpack').contains("Add to cart").click();
-
-    const cartIcon = cy.get('#shopping_cart_container .shopping_cart_link');
-    cartIcon.contains('1')
-    cartIcon.click()
-    cy.contains('Sauce Labs Backpack').should('be.visible');
+    cy.login(userLogin, userPassword);
   });
 
-  it("Should proceed to checkout", () => {
-    cy.visit('/?/cart.html')
-    cy.get('#checkout').click();
-    cy.get('#first-name').type('John');
-    cy.get('#last-name').type('Doe');
-    cy.get('#postal-code').type('00-001');
-    cy.get('#continue').click();
-  })
+
+  it("Should buy a backpack", () => {
+    cy.visit('?/inventory.html');
+    cy.addProductToCart(backpack);
+
+    cy.checkIfCartIconShowsNumberOfItems(1);
+
+    cy.navigateToCart();
+
+    cy.checkIfItemNameIsVisibleInTheCart(backpackName)
+
+    cy.navigateToCheckout();
+
+    cy.insertUsersData(buyer.firstName, buyer.lastName, buyer.postalCode);
+
+    cy.checkProductInOwerview(backpackName);
+
+    cy.finishCheckout();
+
+    cy.checkIfItemPurchasedSuccessfully();
+    
+  });
 });
