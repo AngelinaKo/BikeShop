@@ -59,7 +59,11 @@ declare global {
 declare global {
   namespace Cypress {
     interface Chainable<Subject> {
-      insertUsersData(firstName: string, lastName: string, postalCode: string): Chainable<any>;
+      insertUsersData(
+        firstName: string,
+        lastName: string,
+        postalCode: string
+      ): Chainable<any>;
     }
   }
 }
